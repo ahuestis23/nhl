@@ -15,10 +15,10 @@ def get_last_update_time():
     url = "https://api.github.com/repos/ahuestis23/nhl/commits?path=final_corr24.csv&per_page=1"
     response = requests.get(url)
     if response.status_code == 200:
-        commit_info = response.json()[0]
-        commit_date = commit_info['commit']['committer']['date']
+        commit_info = response.json()[0]  # Get the latest commit data
+        commit_date = commit_info['commit']['committer']['date']  # Extract the committer's date
         # Convert to a readable format
-        last_updated = datetime.fromisoformat(commit_date[:-1])  # Remove 'Z' from the end of the date
+        last_updated = datetime.fromisoformat(commit_date.replace("Z", "+00:00"))
         return last_updated.strftime("%Y-%m-%d %H:%M:%S")
     else:
         return "Could not fetch update time"
