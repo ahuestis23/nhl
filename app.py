@@ -101,3 +101,58 @@ with tab2:
         file_name="filtered_game_logs.csv",
         mime="text/csv"
     )
+
+### Tab 3: Trio analysis
+with tab3:
+    st.title("NHL Trios Analysis")
+
+    # Select a team from the unique list of teams
+    st.subheader("Select a Team")
+    teams = game_logs['TeamAbbrev'].unique()
+    selected_team = st.selectbox("Choose a Team", sorted(teams))
+
+    # Filter data to only include the selected team
+    team_data = game_logs[game_logs['TeamAbbrev'] == selected_team]
+
+    # Get all unique players from the selected team
+    team_data['FullName'] = team_data['FirstName'] + " " + team_data['LastName']
+    team_players = team_data['FullName'].unique()
+
+    # Find all combinations of 3 players
+    from itertools import combinations
+    player_combinations = list(combinations(team_players, 3))
+
+    # Calculate the number of games where all 3 players recorded at least 1 point
+    trio_game_counts = []
+    for trio in player_combinations:
+        player_a, player_b, player_c = trio
+        # Filter games where all 3 players recorded at least 1 point
+        games_with_trio = team_data[
+            ((team_data['FullName'] == player_a) & (team_data['Points'] >= 1)) |
+            ((team_data['FullName'] == player_b) & (team_data['Points'] >= 1)) |
+            ((team_data['FullName'] == player_c) & (team_data['Points'] >= 1))
+        ]
+        games_with_trio_count = (
+            games_with_trio['GameID']
+            .value_counts()
+            .loc[lambda x: x >= 3]  # Ensure all 3 players have points in the same game
+            .count()
+        )
+        trio_game_counts.append({'Trio': trio, 'Games': games_with_trio_count})
+
+    # Convert to a DataFrame for display
+    trio_results = pd.DataFrame(trio_game_counts)
+    trio_results = trio_results.sort_values(by='Games', ascending=False)
+
+    # Display the top trios
+    st.write(f"Top Trios for {selected_team}")
+    st.write(trio_results.head(10))
+
+    # Option to download the full list of trios
+    st.download_button(
+        label="Download Trio Results",
+        data=trio_results.to_csv(index=False),
+        file_name=f"{selected_team}_trio_results.csv",
+        mime="text/csv"
+    )
+
