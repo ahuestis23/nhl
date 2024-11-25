@@ -76,28 +76,29 @@ with tab2:
         player_points = st.selectbox("Player for Points", unique_players, key="points_player")
         min_points = st.number_input("Minimum Points", min_value=0, value=1, step=1, key="points_filter")
 
+    # Apply filtering logic
     filtered_game_logs = game_logs[
-    ((game_logs['FullName'] == player_goals) & (game_logs['Goals'] >= min_goals)) |
-    ((game_logs['FullName'] == player_assists) & (game_logs['Assists'] >= min_assists)) |
-    ((game_logs['FullName'] == player_points) & (game_logs['Points'] >= min_points))
+        ((game_logs['FullName'] == player_goals) & (game_logs['Goals'] >= min_goals)) |
+        ((game_logs['FullName'] == player_assists) & (game_logs['Assists'] >= min_assists)) |
+        ((game_logs['FullName'] == player_points) & (game_logs['Points'] >= min_points))
     ]
 
-    # Group by GameID to ensure all conditions are met within the same game
+    # Ensure all 3 conditions are met in the same game
     game_ids_meeting_conditions = filtered_game_logs['GameID'].value_counts()
     valid_game_ids = game_ids_meeting_conditions[
-        game_ids_meeting_conditions >= 3  # Must match 3 distinct conditions
+        game_ids_meeting_conditions >= 3  # All 3 conditions
     ].index
-    
+
     final_filtered_game_logs = filtered_game_logs[filtered_game_logs['GameID'].isin(valid_game_ids)]
 
-    # Show results
+    # Display results
     st.write("Filtered Game Logs")
-    st.write(filtered_game_logs[['GameID', 'GameDate']])
+    st.write(final_filtered_game_logs[['GameID', 'GameDate']].drop_duplicates())
 
     # Download button for filtered game logs
     st.download_button(
         label="Download Filtered Game Logs",
-        data=filtered_game_logs[['GameID', 'GameDate']].to_csv(index=False),
+        data=final_filtered_game_logs[['GameID', 'GameDate']].drop_duplicates().to_csv(index=False),
         file_name="filtered_game_logs.csv",
         mime="text/csv"
     )
