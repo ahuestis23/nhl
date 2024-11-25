@@ -78,9 +78,9 @@ with tab2:
 
     # Filter data based on user input
     filtered_game_logs = game_logs[
-        ((game_logs['FullName'] == player_goals) & (game_logs['Goals'] >= min_goals)) |
-        ((game_logs['FullName'] == player_assists) & (game_logs['Assists'] >= min_assists)) |
-        ((game_logs['FullName'] == player_points) & (game_logs['Points'] >= min_points))
+    ((game_logs['FullName'] == player_goals) & (game_logs['Goals'] >= min_goals)) &
+    ((game_logs['FullName'] == player_assists) & (game_logs['Assists'] >= min_assists)) &
+    ((game_logs['FullName'] == player_points) & (game_logs['Points'] >= min_points))
     ]
 
     # Show results
