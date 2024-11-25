@@ -54,39 +54,38 @@ with tab1:
 with tab2:
     st.title("Game Log Query (2024)")
 
-    # Select player and criteria for Goals, Assists, and Points
-    st.subheader("Filter by Player Performance")
-
-    # Get unique player names for dropdowns
+    # Get unique player names and available markets
     game_logs['FullName'] = game_logs['FirstName'] + " " + game_logs['LastName']
     unique_players = game_logs['FullName'].unique()
+    available_markets = ['Goals', 'Assists', 'Points', 'Shots']  # Add more markets as needed
 
-    # Filtering inputs for Goals, Assists, Points
-    col1, col2, col3 = st.columns(3)
+    # Dynamic filtering mechanism
+    st.subheader("Dynamic Market Filtering")
+    num_filters = st.number_input("Number of Filters", min_value=1, max_value=5, value=3, step=1)
 
-    with col1:
-        player_goals = st.selectbox("Player for Goals", unique_players, key="goals_player")
-        min_goals = st.number_input("Minimum Goals", min_value=0, value=1, step=1, key="goals_filter")
+    filters = []
+    for i in range(num_filters):
+        st.write(f"Filter {i + 1}")
+        player = st.selectbox(f"Select Player for Filter {i + 1}", unique_players, key=f"player_{i}")
+        market = st.selectbox(f"Select Market for Filter {i + 1}", available_markets, key=f"market_{i}")
+        threshold = st.number_input(f"Minimum {market} for Filter {i + 1}", min_value=0, value=1, step=1, key=f"threshold_{i}")
+        filters.append({'player': player, 'market': market, 'threshold': threshold})
 
-    with col2:
-        player_assists = st.selectbox("Player for Assists", unique_players, key="assists_player")
-        min_assists = st.number_input("Minimum Assists", min_value=0, value=1, step=1, key="assists_filter")
+    # Apply filtering logic dynamically
+    filtered_game_logs = pd.DataFrame()  # Placeholder for filtered rows
+    for filter_item in filters:
+        player = filter_item['player']
+        market = filter_item['market']
+        threshold = filter_item['threshold']
 
-    with col3:
-        player_points = st.selectbox("Player for Points", unique_players, key="points_player")
-        min_points = st.number_input("Minimum Points", min_value=0, value=1, step=1, key="points_filter")
+        # Filter rows matching the current filter
+        condition = (game_logs['FullName'] == player) & (game_logs[market] >= threshold)
+        filtered_game_logs = pd.concat([filtered_game_logs, game_logs[condition]])
 
-    # Apply filtering logic
-    filtered_game_logs = game_logs[
-        ((game_logs['FullName'] == player_goals) & (game_logs['Goals'] >= min_goals)) |
-        ((game_logs['FullName'] == player_assists) & (game_logs['Assists'] >= min_assists)) |
-        ((game_logs['FullName'] == player_points) & (game_logs['Points'] >= min_points))
-    ]
-
-    # Ensure all 3 conditions are met in the same game
+    # Ensure all conditions are met in the same game
     game_ids_meeting_conditions = filtered_game_logs['GameID'].value_counts()
     valid_game_ids = game_ids_meeting_conditions[
-        game_ids_meeting_conditions >= 3  # All 3 conditions
+        game_ids_meeting_conditions >= num_filters  # Must meet all conditions
     ].index
 
     final_filtered_game_logs = filtered_game_logs[filtered_game_logs['GameID'].isin(valid_game_ids)]
@@ -102,4 +101,3 @@ with tab2:
         file_name="filtered_game_logs.csv",
         mime="text/csv"
     )
-
