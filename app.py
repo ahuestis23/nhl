@@ -173,6 +173,7 @@ with tab3:
     )
 
 ### Tab 4: Involved Points Percentage
+### Tab 4: Involved Points Percentage
 with tab4:
     st.title("Involved Points Percentage")
 
@@ -190,8 +191,16 @@ with tab4:
     if player_data.empty:
         st.warning(f"No data found for {selected_player}.")
     else:
+        # View raw dataset filtered for the selected player and specific columns
+        st.subheader("Raw Data View")
+        st.write(player_data[['player_name', 'assist_player1_name', 'assist_player2_name']])
+
         # Calculate total points for the selected player
         total_points = len(player_data)
+
+        # Display total points for the selected player
+        st.subheader(f"Total Points for {selected_player}")
+        st.write(f"Total Points Involved: **{total_points}**")
 
         # Identify teammates involved in the same plays
         # Extract teammates (exclude the selected player from their own involvement)
@@ -204,10 +213,6 @@ with tab4:
             .dropna()
             .value_counts()
         )
-
-        # Display total points for the selected player
-        st.subheader(f"Total Points for {selected_player}")
-        st.write(f"Total Points Involved: **{total_points}**")
 
         # Display teammate involvement data
         st.subheader(f"Teammate Involvement in Points for {selected_player}")
@@ -226,6 +231,3 @@ with tab4:
         # Display pie chart
         st.pyplot(fig)
 
-        # View raw dataset filtered for the selected player and specific columns
-        st.subheader("Raw Data View")
-        st.write(player_data[['player_name', 'assist_player1_name', 'assist_player2_name']])
