@@ -177,16 +177,15 @@ with tab4:
     st.title("Involved Points Percentage")
 
     # Dropdown to select a player
-    season_scores['FullName'] = season_scores['FirstName'] + " " + season_scores['LastName']
-    selected_player = st.selectbox("Select a Player", sorted(season_scores['FullName'].unique()))
+    selected_player = st.selectbox("Select a Player", sorted(season_scores['player_name'].unique()))
 
     # Filter data for the selected player
     player_data = season_scores[
-        (season_scores['FullName'] == selected_player) & (season_scores['Points'] >= 1)
+        (season_scores['player_name'] == selected_player) & (season_scores['Points'] >= 1)
     ]
 
     # Count teammate involvement
-    teammate_involvement = player_data['FullName'].value_counts()
+    teammate_involvement = player_data['player_name'].value_counts()
 
     # Create a pie chart
     fig, ax = plt.subplots()
