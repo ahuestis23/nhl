@@ -186,6 +186,9 @@ with tab4:
         (season_scores['assist_player2_name'] == selected_player)
     ]
 
+    # Calculate total points for the selected player
+    total_points = len(player_data)
+
     # Identify teammates involved in the same plays
     # Extract teammates (exclude the selected player from their own involvement)
     teammate_counts = (
@@ -198,6 +201,19 @@ with tab4:
         .value_counts()
     )
 
+    # Display total points for the selected player
+    st.subheader(f"Total Points for {selected_player}")
+    st.write(f"Total Points Involved: **{total_points}**")
+
+    # Display teammate involvement data
+    st.subheader(f"Teammate Involvement in Points for {selected_player}")
+    teammate_data = pd.DataFrame({
+        'Teammate': teammate_counts.index,
+        'Involvement Count': teammate_counts.values,
+        'Percentage': (teammate_counts.values / total_points * 100).round(1)
+    })
+    st.write(teammate_data)
+
     # Create a pie chart
     fig, ax = plt.subplots()
     ax.pie(teammate_counts, labels=teammate_counts.index, autopct='%1.1f%%', startangle=90)
@@ -206,6 +222,3 @@ with tab4:
     # Display pie chart
     st.pyplot(fig)
 
-    # Optionally display raw teammate data
-    st.subheader("Teammate Involvement Data")
-    st.write(teammate_counts)
