@@ -175,20 +175,20 @@ with tab3:
 ### Tab 4: Involved Points Percentage
 with tab4:
     st.title("Involved Points Percentage")
-    
+
     # Dropdown to select a player
     selected_player = st.selectbox("Select a Player", sorted(season_scores['player_name'].unique()))
-    
+
     # Filter data for rows where the selected player is involved (player, assist1, or assist2)
     player_data = season_scores[
         (season_scores['player_name'] == selected_player) |
         (season_scores['assist_player1_name'] == selected_player) |
         (season_scores['assist_player2_name'] == selected_player)
     ]
-    
+
     # Calculate total points for the selected player
     total_points = len(player_data)
-    
+
     # Identify teammates involved in the same plays
     # Extract teammates (exclude the selected player from their own involvement)
     teammate_counts = (
@@ -200,11 +200,11 @@ with tab4:
         .dropna()
         .value_counts()
     )
-    
+
     # Display total points for the selected player
     st.subheader(f"Total Points for {selected_player}")
     st.write(f"Total Points Involved: **{total_points}**")
-    
+
     # Display teammate involvement data
     st.subheader(f"Teammate Involvement in Points for {selected_player}")
     teammate_data = pd.DataFrame({
@@ -213,7 +213,7 @@ with tab4:
         'Percentage': (teammate_counts.values / total_points * 100).round(1)
     })
     st.write(teammate_data)
-    
+
     # Create a pie chart with a transparent background
     fig, ax = plt.subplots(figsize=(6, 6), facecolor='none')
     ax.pie(
@@ -224,14 +224,13 @@ with tab4:
         textprops={'color': 'black'}  # Ensure text is visible on transparent background
     )
     ax.set_title(f"Teammate Involvement in Points for {selected_player}", color='black')
-    
+
     # Make the chart background transparent
     fig.patch.set_alpha(0.0)  # Transparent figure background
-    
+
     # Display pie chart
     st.pyplot(fig)
-    
-    # View raw dataset filtered for the selected player
-    st.subheader("Raw Data View")
-    st.write(player_data)
 
+    # View raw dataset filtered for the selected player and specific columns
+    st.subheader("Raw Data View")
+    st.write(player_data[['player_name', 'assist_player1_name', 'assist_player2_name']])
