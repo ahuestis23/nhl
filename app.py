@@ -214,19 +214,10 @@ with tab4:
     })
     st.write(teammate_data)
 
-    # Create a pie chart with a transparent background
-    fig, ax = plt.subplots(figsize=(6, 6), facecolor='none')
-    ax.pie(
-        teammate_counts,
-        labels=teammate_counts.index,
-        autopct='%1.1f%%',
-        startangle=90,
-        textprops={'color': 'black'}  # Ensure text is visible on transparent background
-    )
-    ax.set_title(f"Teammate Involvement in Points for {selected_player}", color='black')
-
-    # Make the chart background transparent
-    fig.patch.set_alpha(0.0)  # Transparent figure background
+    # Create a pie chart
+    fig, ax = plt.subplots()
+    ax.pie(teammate_counts, labels=teammate_counts.index, autopct='%1.1f%%', startangle=90)
+    ax.set_title(f"Teammate Involvement in Points for {selected_player}")
 
     # Display pie chart
     st.pyplot(fig)
