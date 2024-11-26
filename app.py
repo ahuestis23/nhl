@@ -173,7 +173,6 @@ with tab3:
     )
 
 ### Tab 4: Involved Points Percentage
-### Tab 4: Involved Points Percentage
 with tab4:
     st.title("Involved Points Percentage")
 
@@ -222,12 +221,4 @@ with tab4:
             'Percentage': (teammate_counts.values / total_points * 100).round(1)
         })
         st.write(teammate_data)
-
-        # Create a pie chart
-        fig, ax = plt.subplots()
-        ax.pie(teammate_counts, labels=teammate_counts.index, autopct='%1.1f%%', startangle=90)
-        ax.set_title(f"Teammate Involvement in Points for {selected_player}")
-
-        # Display pie chart
-        st.pyplot(fig)
 
