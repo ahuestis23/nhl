@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from itertools import combinations
+import matplotlib.pyplot as plt
 
 # Load datasets with caching
 @st.cache_data
@@ -11,12 +12,17 @@ def load_corr_data():
 def load_game_logs():
     return pd.read_csv('game_logs_2024.csv')
 
+@st.cache_data
+def load_season_scores():
+    return pd.read_csv('nhl_season_scores.csv')  # Replace with your file name if needed
+
 # Load data
 corr_data = load_corr_data()
 game_logs = load_game_logs()
+season_scores = load_season_scores()
 
 # Add tabs to Streamlit app
-tab1, tab2, tab3 = st.tabs(["Player Correlations", "Game Log Query", "NHL Trios"])
+tab1, tab2, tab3, tab4 = st.tabs(["Player Correlations", "Game Log Query", "NHL Trios", "Involved Points Percentage"])
 
 ### Tab 1: Existing Correlation Analysis
 with tab1:
@@ -165,3 +171,27 @@ with tab3:
         file_name=f"{selected_team}_trio_results.csv",
         mime="text/csv"
     )
+
+### Tab 4: Involved Points Percentage
+with tab4:
+    st.title("Involved Points Percentage")
+
+    # Dropdown to select a player
+    season_scores['FullName'] = season_scores['FirstName'] + " " + season_scores['LastName']
+    selected_player = st.selectbox("Select a Player", sorted(season_scores['FullName'].unique()))
+
+    # Filter data for the selected player
+    player_data = season_scores[
+        (season_scores['FullName'] == selected_player) & (season_scores['Points'] >= 1)
+    ]
+
+    # Count teammate involvement
+    teammate_involvement = player_data['FullName'].value_counts()
+
+    # Create a pie chart
+    fig, ax = plt.subplots()
+    ax.pie(teammate_involvement, labels=teammate_involvement.index, autopct='%1.1f%%')
+    ax.set_title(f"Teammate Involvement in Points for {selected_player}")
+
+    # Display pie chart
+    st.pyplot(fig)
