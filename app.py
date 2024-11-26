@@ -179,18 +179,33 @@ with tab4:
     # Dropdown to select a player
     selected_player = st.selectbox("Select a Player", sorted(season_scores['player_name'].unique()))
 
-    # Filter data for the selected player
+    # Filter data for rows where the selected player is involved (player, assist1, or assist2)
     player_data = season_scores[
-        (season_scores['player_name'] == selected_player) & (season_scores['Points'] >= 1)
+        (season_scores['player_name'] == selected_player) |
+        (season_scores['assist_player1_name'] == selected_player) |
+        (season_scores['assist_player2_name'] == selected_player)
     ]
 
-    # Count teammate involvement
-    teammate_involvement = player_data['player_name'].value_counts()
+    # Identify teammates involved in the same plays
+    # Extract teammates (exclude the selected player from their own involvement)
+    teammate_counts = (
+        pd.concat([
+            player_data.loc[player_data['assist_player1_name'] != selected_player, 'assist_player1_name'],
+            player_data.loc[player_data['assist_player2_name'] != selected_player, 'assist_player2_name'],
+            player_data.loc[player_data['player_name'] != selected_player, 'player_name']
+        ])
+        .dropna()
+        .value_counts()
+    )
 
     # Create a pie chart
     fig, ax = plt.subplots()
-    ax.pie(teammate_involvement, labels=teammate_involvement.index, autopct='%1.1f%%')
+    ax.pie(teammate_counts, labels=teammate_counts.index, autopct='%1.1f%%', startangle=90)
     ax.set_title(f"Teammate Involvement in Points for {selected_player}")
 
     # Display pie chart
     st.pyplot(fig)
+
+    # Optionally display raw teammate data
+    st.subheader("Teammate Involvement Data")
+    st.write(teammate_counts)
