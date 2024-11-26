@@ -186,42 +186,46 @@ with tab4:
         (season_scores['assist_player2_name'] == selected_player)
     ]
 
-    # Calculate total points for the selected player
-    total_points = len(player_data)
+    # Ensure there is data to display
+    if player_data.empty:
+        st.warning(f"No data found for {selected_player}.")
+    else:
+        # Calculate total points for the selected player
+        total_points = len(player_data)
 
-    # Identify teammates involved in the same plays
-    # Extract teammates (exclude the selected player from their own involvement)
-    teammate_counts = (
-        pd.concat([
-            player_data.loc[player_data['assist_player1_name'] != selected_player, 'assist_player1_name'],
-            player_data.loc[player_data['assist_player2_name'] != selected_player, 'assist_player2_name'],
-            player_data.loc[player_data['player_name'] != selected_player, 'player_name']
-        ])
-        .dropna()
-        .value_counts()
-    )
+        # Identify teammates involved in the same plays
+        # Extract teammates (exclude the selected player from their own involvement)
+        teammate_counts = (
+            pd.concat([
+                player_data.loc[player_data['assist_player1_name'] != selected_player, 'assist_player1_name'],
+                player_data.loc[player_data['assist_player2_name'] != selected_player, 'assist_player2_name'],
+                player_data.loc[player_data['player_name'] != selected_player, 'player_name']
+            ])
+            .dropna()
+            .value_counts()
+        )
 
-    # Display total points for the selected player
-    st.subheader(f"Total Points for {selected_player}")
-    st.write(f"Total Points Involved: **{total_points}**")
+        # Display total points for the selected player
+        st.subheader(f"Total Points for {selected_player}")
+        st.write(f"Total Points Involved: **{total_points}**")
 
-    # Display teammate involvement data
-    st.subheader(f"Teammate Involvement in Points for {selected_player}")
-    teammate_data = pd.DataFrame({
-        'Teammate': teammate_counts.index,
-        'Involvement Count': teammate_counts.values,
-        'Percentage': (teammate_counts.values / total_points * 100).round(1)
-    })
-    st.write(teammate_data)
+        # Display teammate involvement data
+        st.subheader(f"Teammate Involvement in Points for {selected_player}")
+        teammate_data = pd.DataFrame({
+            'Teammate': teammate_counts.index,
+            'Involvement Count': teammate_counts.values,
+            'Percentage': (teammate_counts.values / total_points * 100).round(1)
+        })
+        st.write(teammate_data)
 
-    # Create a pie chart
-    fig, ax = plt.subplots()
-    ax.pie(teammate_counts, labels=teammate_counts.index, autopct='%1.1f%%', startangle=90)
-    ax.set_title(f"Teammate Involvement in Points for {selected_player}")
+        # Create a pie chart
+        fig, ax = plt.subplots()
+        ax.pie(teammate_counts, labels=teammate_counts.index, autopct='%1.1f%%', startangle=90)
+        ax.set_title(f"Teammate Involvement in Points for {selected_player}")
 
-    # Display pie chart
-    st.pyplot(fig)
+        # Display pie chart
+        st.pyplot(fig)
 
-    # View raw dataset filtered for the selected player and specific columns
-    st.subheader("Raw Data View")
-    st.write(player_data[['player_name', 'assist_player1_name', 'assist_player2_name']])
+        # View raw dataset filtered for the selected player and specific columns
+        st.subheader("Raw Data View")
+        st.write(player_data[['player_name', 'assist_player1_name', 'assist_player2_name']])
