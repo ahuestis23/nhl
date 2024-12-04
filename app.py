@@ -16,13 +16,18 @@ def load_game_logs():
 def load_season_scores():
     return pd.read_csv('nhl_season_scores.csv')  # Replace with your file name if needed
 
+@st.cache_data
+def load_sog_corr():
+    return pd.read_csv('sog_corr_2023.csv')  # Replace with your file path
+
 # Load data
 corr_data = load_corr_data()
 game_logs = load_game_logs()
 season_scores = load_season_scores()
+sog_corr_data = load_sog_corr()
 
 # Add tabs to Streamlit app
-tab1, tab2, tab3, tab4 = st.tabs(["Player Correlations", "Game Log Query", "NHL Trios", "Involved Points Percentage"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Player Correlations", "Game Log Query", "NHL Trios", "Involved Points Percentage", "SOG Correlations"])
 
 ### Tab 1: Existing Correlation Analysis
 with tab1:
@@ -244,3 +249,24 @@ with tab4:
     # Display the sorted data with specified columns
     st.write(sorted_player_data[['game_date', 'home_team', 'away_team', 'player_name', 'assist_player1_name', 'assist_player2_name']])
 
+### Tab 5: Filter and Display sog_corr_2023.csv
+with tab5:
+    st.title("Filter and Display SOG Correlation Data (2023)")
+
+    # Dropdown to select a value from TeamAbbrev_x
+    team_selection = st.selectbox("Select a Team (TeamAbbrev_x)", sorted(sog_corr_data['TeamAbbrev_x'].unique()))
+
+    # Filter the data based on the selected team
+    filtered_sog_corr_data = sog_corr_data[sog_corr_data['TeamAbbrev_x'] == team_selection]
+
+    # Display the filtered data
+    st.subheader(f"Filtered SOG Correlation Data for {team_selection}")
+    st.write(filtered_sog_corr_data)
+
+    # Download button for the filtered data
+    st.download_button(
+        label="Download Filtered SOG Correlation Data",
+        data=filtered_sog_corr_data.to_csv(index=False),
+        file_name=f"sog_corr_filtered_{team_selection}.csv",
+        mime="text/csv"
+    )
