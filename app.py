@@ -265,19 +265,12 @@ with tab5:
     filtered_sog_corr_data24 = sog_corr_data24[sog_corr_data24['TeamAbbrev_x'] == team_selection]
 
     # Display the filtered data
-    st.subheader(f"Filtered SOG Correlation Data for {team_selection}")
+    st.subheader(f"Filtered 2024 SOG Correlation Data for {team_selection}")
     st.write(filtered_sog_corr_data24)
 
-    # Download button for the filtered data
-    st.download_button(
-        label="Download Filtered SOG Correlation Data",
-        data=filtered_sog_corr_data.to_csv(index=False),
-        file_name=f"sog_corr_filtered_{team_selection}.csv",
-        mime="text/csv"
-    )
     # Filter the data based on the selected team
     filtered_sog_corr_data23 = sog_corr_data23[sog_corr_data23['TeamAbbrev_x'] == team_selection]
 
     # Display the filtered data
-    st.subheader(f"Filtered SOG Correlation Data for {team_selection}")
+    st.subheader(f"Filtered 2023 SOG Correlation Data for {team_selection}")
     st.write(filtered_sog_corr_data23)
